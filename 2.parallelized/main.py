@@ -53,34 +53,38 @@ class Individual:
         return self
 
 
-@ray.remote
-def eval_individual(ind: Individual, env_name: str) -> float:
+def eval_individual(ind: Individual, env_name: str, render=False) -> float:
     env = gym.make(env_name)
     observation = env.reset()
     total = 0.0
     for _ in range(1000):
         action = ind.eval(observation)
 
+        if render:
+            env.render()
+
         observation, reward, done, info = env.step(action)
         total += reward
 
         if done:
+            env.close()
             return total
 
     return float("-inf")
 
-def main():
-    print("hello")
+remote_eval_individual = ray.remote(eval_individual)
 
+def main():
     population_size = 100
 
-    env_name = "CartPole-v1"
-    state_space = 4
-    action_space = 2
+    # env_name = "CartPole-v1"
+    # state_space = 4
+    # action_space = 2
 
-    # env_name = "LunarLander-v2"
-    # state_space = 8
-    # action_space = 4
+    env_name = "LunarLander-v2"
+    state_space = 8
+    action_space = 4
+    render = False
 
 
     # create population
@@ -93,7 +97,7 @@ def main():
     while True:
 
         ## eval individuals
-        evals = ray.get([eval_individual.remote(ind, env_name) for ind in population])
+        evals = ray.get([remote_eval_individual.remote(ind, env_name) for ind in population])
 
         ## select
         selected_indexes = np.argsort(evals)[::-1][0 : len(evals) // 2]
@@ -103,9 +107,8 @@ def main():
 
         print(f"{generation} - Best: {best_eval}")
 
-        # if best_eval < 1e-4:
-        #     print(best)
-        #     break
+        if render:
+            print(eval_individual(best, env_name, True))
 
         new_population = [population[k] for k in selected_indexes]
 
