@@ -39,7 +39,7 @@ class Individual:
 
     def mutate(self):
 
-        lr = 1e-2
+        lr = 1e-1
 
         self.l1 = self.l1 + np.random.randn(*self.l1.shape) * lr
         self.b1 = self.b1 + np.random.randn(*self.b1.shape) * lr
@@ -54,17 +54,15 @@ class Individual:
 
 
 def main():
-    print("hello")
-
     population_size = 100
 
-    # env_name = "CartPole-v1"
-    # state_space = 4
-    # action_space = 2
+    env_name = "CartPole-v1"
+    state_space = 4
+    action_space = 2
 
-    env_name = "LunarLander-v2"
-    state_space = 8
-    action_space = 4
+    # env_name = "LunarLander-v2"
+    # state_space = 8
+    # action_space = 4
 
 
     # create population
@@ -100,10 +98,6 @@ def main():
         best_eval = evals[selected_indexes[0]]
 
         print(f"{generation} - Best: {best_eval}")
-
-        if best_eval < 1e-4:
-            print(best)
-            break
 
         new_population = [population[k] for k in selected_indexes]
 

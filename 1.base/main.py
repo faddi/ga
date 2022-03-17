@@ -5,8 +5,6 @@ random.seed(100)
 
 
 def main():
-    print("hello")
-
     population_size = 100
     target = 2000
 

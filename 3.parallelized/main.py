@@ -77,13 +77,14 @@ remote_eval_individual = ray.remote(eval_individual)
 def main():
     population_size = 100
 
-    # env_name = "CartPole-v1"
-    # state_space = 4
-    # action_space = 2
+    env_name = "CartPole-v1"
+    state_space = 4
+    action_space = 2
 
-    env_name = "LunarLander-v2"
-    state_space = 8
-    action_space = 4
+    # env_name = "LunarLander-v2"
+    # state_space = 8
+    # action_space = 4
+
     render = False
 
 
@@ -121,7 +122,4 @@ def main():
 
 
 if __name__ == "__main__":
-
-    # ray.init()
-
     main()
