@@ -22,6 +22,6 @@ Mutation: sample nn weight shifts from normal distribution.
 
 **4.cma-es**
 
-Fitness: Openai gym.
-Genes: nn weights, implemented in numpy.
+Fitness: Openai gym.  
+Genes: nn weights, implemented in numpy.  
 Using [CMA-ES](https://en.wikipedia.org/wiki/CMA-ES) to sample weights.
