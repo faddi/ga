@@ -6,13 +6,16 @@ import ray
 
 random.seed(100)
 
+
 def softmax(x, axis=None):
     x = x - x.max(axis=axis, keepdims=True)
     y = np.exp(x)
     return y / y.sum(axis=axis, keepdims=True)
 
+
 class Individual:
     def __init__(self, input_size: int, output_size: int) -> None:
+        self.lr = 1e-1
         h = 32
         self.l1 = np.random.randn(input_size, h)
         self.b1 = np.random.randn(h)
@@ -40,15 +43,15 @@ class Individual:
 
     def mutate(self):
 
-        lr = 1e-1
+        self.lr = self.lr * np.exp(np.random.randn() * 0.1)
 
-        self.l1 = self.l1 + np.random.randn(*self.l1.shape) * lr
-        self.b1 = self.b1 + np.random.randn(*self.b1.shape) * lr
+        self.l1 = self.l1 + np.random.randn(*self.l1.shape) * self.lr
+        self.b1 = self.b1 + np.random.randn(*self.b1.shape) * self.lr
 
-        self.l2 = self.l2 + np.random.randn(*self.l2.shape) * lr
-        self.b2 = self.b2 + np.random.randn(*self.b2.shape) * lr
+        self.l2 = self.l2 + np.random.randn(*self.l2.shape) * self.lr
+        self.b2 = self.b2 + np.random.randn(*self.b2.shape) * self.lr
 
-        self.l3 = self.l3 + np.random.randn(*self.l3.shape) * lr
+        self.l3 = self.l3 + np.random.randn(*self.l3.shape) * self.lr
 
         return self
 
@@ -72,7 +75,9 @@ def eval_individual(ind: Individual, env_name: str, render=False) -> float:
 
     return float("-inf")
 
+
 remote_eval_individual = ray.remote(eval_individual)
+
 
 def main():
     population_size = 100
@@ -87,10 +92,8 @@ def main():
 
     render = False
 
-
     # create population
     population = [Individual(state_space, action_space) for _ in range(population_size)]
-
 
     generation = 1
 
@@ -98,7 +101,9 @@ def main():
     while True:
 
         ## eval individuals
-        evals = ray.get([remote_eval_individual.remote(ind, env_name) for ind in population])
+        evals = ray.get(
+            [remote_eval_individual.remote(ind, env_name) for ind in population]
+        )
 
         ## select
         selected_indexes = np.argsort(evals)[::-1][0 : len(evals) // 2]
@@ -106,7 +111,7 @@ def main():
         best = population[selected_indexes[0]]
         best_eval = evals[selected_indexes[0]]
 
-        print(f"{generation} - Best: {best_eval}")
+        print(f"{generation} - Best: {best_eval} - Mean: {np.mean(evals)}")
 
         if render:
             print(eval_individual(best, env_name, True))

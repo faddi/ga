@@ -5,10 +5,12 @@ import gym
 
 random.seed(100)
 
+
 def softmax(x, axis=None):
     x = x - x.max(axis=axis, keepdims=True)
     y = np.exp(x)
     return y / y.sum(axis=axis, keepdims=True)
+
 
 class Individual:
     def __init__(self, input_size: int, output_size: int) -> None:
@@ -52,7 +54,6 @@ class Individual:
         return self
 
 
-
 def main():
     population_size = 100
 
@@ -63,7 +64,6 @@ def main():
     # env_name = "LunarLander-v2"
     # state_space = 8
     # action_space = 4
-
 
     # create population
     population = [Individual(state_space, action_space) for _ in range(population_size)]
