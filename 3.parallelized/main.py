@@ -27,8 +27,7 @@ class Individual:
 
         self.output_size = output_size
 
-    def eval(self, input: np.ndarray):
-
+    def select_action(self, input: np.ndarray):
         x = np.dot(input, self.l1) + self.b1
         x = np.tanh(x)
 
@@ -42,7 +41,6 @@ class Individual:
         return out
 
     def mutate(self):
-
         self.lr = self.lr * np.exp(np.random.randn() * 0.1)
 
         self.l1 = self.l1 + np.random.randn(*self.l1.shape) * self.lr
@@ -61,7 +59,7 @@ def eval_individual(ind: Individual, env_name: str, render=False) -> float:
     observation = env.reset()
     total = 0.0
     for _ in range(1000):
-        action = ind.eval(observation)
+        action = ind.select_action(observation)
 
         if render:
             env.render()
@@ -82,13 +80,13 @@ remote_eval_individual = ray.remote(eval_individual)
 def main():
     population_size = 100
 
-    env_name = "CartPole-v1"
-    state_space = 4
-    action_space = 2
+    # env_name = "CartPole-v1"
+    # state_space = 4
+    # action_space = 2
 
-    # env_name = "LunarLander-v2"
-    # state_space = 8
-    # action_space = 4
+    env_name = "LunarLander-v2"
+    state_space = 8
+    action_space = 4
 
     render = False
 
@@ -99,7 +97,6 @@ def main():
 
     # run main loop
     while True:
-
         ## eval individuals
         evals = ray.get(
             [remote_eval_individual.remote(ind, env_name) for ind in population]

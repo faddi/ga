@@ -25,8 +25,7 @@ class Individual:
 
         self.output_size = output_size
 
-    def eval(self, input: np.ndarray):
-
+    def select_action(self, input: np.ndarray):
         x = np.dot(input, self.l1) + self.b1
         x = np.tanh(x)
 
@@ -40,7 +39,6 @@ class Individual:
         return out
 
     def mutate(self):
-
         lr = 1e-1
 
         self.l1 = self.l1 + np.random.randn(*self.l1.shape) * lr
@@ -73,7 +71,7 @@ def main():
         observation = env.reset()
         total = 0.0
         for _ in range(1000):
-            action = ind.eval(observation)
+            action = ind.select_action(observation)
 
             observation, reward, done, info = env.step(action)
             total += reward
@@ -87,7 +85,6 @@ def main():
 
     # run main loop
     while True:
-
         ## eval individuals
         evals = [eval_individual(ind) for ind in population]
 

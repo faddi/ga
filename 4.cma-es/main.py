@@ -27,8 +27,7 @@ class Individual:
 
         self.output_size = output_size
 
-    def eval(self, input: np.ndarray):
-
+    def select_action(self, input: np.ndarray):
         x = np.dot(input, self.l1) + self.b1
         x = np.tanh(x)
 
@@ -72,7 +71,7 @@ def eval_individual(ind: Individual, env_name: str, render=False) -> float:
     observation = env.reset()
     total = 0.0
     for _ in range(1000):
-        action = ind.eval(observation)
+        action = ind.select_action(observation)
 
         if render:
             env.render()
@@ -121,7 +120,6 @@ def main():
 
     # run main loop
     while True:
-
         solutions = es.ask()
         for i, solution in enumerate(solutions):
             population[i].from_vector(solution)
