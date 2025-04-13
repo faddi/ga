@@ -1,7 +1,7 @@
 import copy
 import random
 import numpy as np
-import gym
+import gymnasium as gym
 
 random.seed(100)
 
@@ -68,15 +68,15 @@ def main():
 
     def eval_individual(ind: Individual) -> float:
         env = gym.make(env_name)
-        observation = env.reset()
+        observation, _ = env.reset()
         total = 0.0
         for _ in range(1000):
             action = ind.select_action(observation)
 
-            observation, reward, done, info = env.step(action)
-            total += reward
+            observation, reward, done, trunc, info = env.step(action)
+            total += float(reward)
 
-            if done:
+            if done or trunc:
                 return total
 
         return float("-inf")
@@ -91,7 +91,6 @@ def main():
         ## select
         selected_indexes = np.argsort(evals)[::-1][0 : len(evals) // 2]
 
-        best = population[selected_indexes[0]]
         best_eval = evals[selected_indexes[0]]
 
         print(f"{generation} - Best: {best_eval}")

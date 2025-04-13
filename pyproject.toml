@@ -1,0 +1,12 @@
+[project]
+name = "ga"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cma>=4.0.0",
+    "gymnasium[all]>=1.0.0",
+    "numpy>=2.2.4",
+    "ray[all]>=2.44.1",
+]

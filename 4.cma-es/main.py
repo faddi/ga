@@ -1,7 +1,6 @@
-import copy
 import random
 import numpy as np
-import gym
+import gymnasium as gym
 import ray
 import cma
 
@@ -68,7 +67,7 @@ class Individual:
 
 def eval_individual(ind: Individual, env_name: str, render=False) -> float:
     env = gym.make(env_name)
-    observation = env.reset()
+    observation, _ = env.reset()
     total = 0.0
     for _ in range(1000):
         action = ind.select_action(observation)
@@ -76,10 +75,10 @@ def eval_individual(ind: Individual, env_name: str, render=False) -> float:
         if render:
             env.render()
 
-        observation, reward, done, info = env.step(action)
-        total += reward
+        observation, reward, done, trunc, info = env.step(action)
+        total += float(reward)
 
-        if done:
+        if done or trunc:
             env.close()
             return total
 
@@ -90,17 +89,17 @@ remote_eval_individual = ray.remote(eval_individual)
 
 
 def main():
-    population_size = 100
+    population_size = 20
 
     # env_name = "CartPole-v1"
     # state_space = 4
     # action_space = 2
 
-    env_name = "LunarLander-v2"
+    env_name = "LunarLander-v3"
     state_space = 8
     action_space = 4
 
-    render = False
+    render = True
 
     # create population
     population = [Individual(state_space, action_space) for _ in range(population_size)]
@@ -145,7 +144,7 @@ def main():
 
         print(f"{generation} - Best: {best_eval:.2f} Mean: {mean_eval:.2f}")
 
-        if render:
+        if render and generation % 50 == 0:
             print(eval_individual(best, env_name, True))
 
         generation += 1

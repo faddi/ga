@@ -1,7 +1,7 @@
 import copy
 import random
 import numpy as np
-import gym
+import gymnasium as gym
 import ray
 
 random.seed(100)
@@ -55,8 +55,11 @@ class Individual:
 
 
 def eval_individual(ind: Individual, env_name: str, render=False) -> float:
-    env = gym.make(env_name)
-    observation = env.reset()
+    
+    render_mode = "human" if render else None
+    
+    env = gym.make(env_name, render_mode=render_mode)
+    observation, _ = env.reset()
     total = 0.0
     for _ in range(1000):
         action = ind.select_action(observation)
@@ -64,10 +67,10 @@ def eval_individual(ind: Individual, env_name: str, render=False) -> float:
         if render:
             env.render()
 
-        observation, reward, done, info = env.step(action)
-        total += reward
+        observation, reward, done, trunc, info = env.step(action)
+        total += float(reward)
 
-        if done:
+        if done or trunc:
             env.close()
             return total
 
@@ -84,7 +87,7 @@ def main():
     # state_space = 4
     # action_space = 2
 
-    env_name = "LunarLander-v2"
+    env_name = "LunarLander-v3"
     state_space = 8
     action_space = 4
 
